@@ -1,9 +1,10 @@
-import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 export default function Home() {
   return (
-    <div>
-      <Button>Testando</Button>
-    </div>
+    <Box>
+      <Typography color="textPrimary">Chronos</Typography>
+    </Box>
   )
 }
