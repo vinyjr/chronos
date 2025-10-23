@@ -27,13 +27,5 @@
       "semicolons": "asNeeded",
       "trailingCommas": "es5"
     }
-  },
-  "assist": {
-    "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": "off"
-      }
-    }
   }
 }
