@@ -1,8 +1,4 @@
-import Toolbar from "@mui/material/Toolbar";
-import AppBar from "@mui/material/AppBar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import MenuIcon from "@mui/icons-material/Menu";
+import { Header } from "@/components/DashboardHeader";
 
 export default function DashboardLayout({
   children,
@@ -10,23 +6,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" color="inherit" component="div">
-            Photos
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <main>{children}</main>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      {/* <Sidebar /> */}
+      <main style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Header title="Chronos" />
+        <div style={{ flexGrow: 1, overflowY: "auto" }}>{children}</div>
+      </main>
     </div>
   );
 }
