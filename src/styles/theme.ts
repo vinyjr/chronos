@@ -11,6 +11,16 @@ export const theme = createTheme({
     error: { main: '#f44336' },
   },
   typography: {
-    fontFamily: 'var(--font-fire-sans)',
+    fontFamily: 'var(--font-inter)',
+    fontSize: 12,
+    h1: {
+      fontSize: 24,
+    },
+    subtitle1: {
+      fontSize: 14,
+      fontWeight: 400,
+      lineHeight: 1.43
+    },
   },
+  
 })

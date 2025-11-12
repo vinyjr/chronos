@@ -27,7 +27,7 @@ export const Header = ({ title = "", onMenuClick }: HeaderProps) => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" noWrap component="div">
+        <Typography variant="h1" noWrap component="div">
           {title}
         </Typography>
       </Toolbar>
