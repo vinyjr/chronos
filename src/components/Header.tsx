@@ -1,5 +1,6 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -18,18 +19,31 @@ export const Header = ({ title = "", onMenuClick }: HeaderProps) => {
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
       <Toolbar>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="start"
-          onClick={onMenuClick}
-          sx={{ mr: 2, display: { sm: "none" } }}
+        <Box
+          sx={{
+            padding: 0,
+            textAlign: "center",
+          }}
         >
-          <MenuIcon />
-        </IconButton>
-        <Typography variant="h1" noWrap component="div">
-          {title}
-        </Typography>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              margin: "0 auto",
+              background: "linear-gradient(135deg, #303633 0%, #8be8cb 100%)",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              fontWeight: 700,
+              color: "white",
+              boxShadow: "0 4px 12px rgba(48, 54, 51, 0.2)",
+            }}
+          >
+            C
+          </Box>
+        </Box>
       </Toolbar>
     </AppBar>
   );

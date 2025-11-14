@@ -1,22 +1,49 @@
 import Link from "next/link";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import Drawer from "@mui/material/Drawer";
-import BadgeIcon from "@mui/icons-material/BadgeRounded";
 import { DRAWER_WIDTH } from "../contants";
+import { usePathname } from "next/navigation";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import { ReactElement } from "react";
+
+interface menuItemProps {
+  text: string;
+  icon: (props: any) => ReactElement;
+  href: string;
+  description: string;
+}
+[];
 
 const menuItems = [
   {
-    text: "Funcionários",
-    icon: <BadgeIcon fontSize="small" color="primary" />,
+    text: "Dashboard",
+    icon: DashboardIcon,
     href: "/dashboard",
+    description: "Visão geral",
   },
-];
+  {
+    text: "Funcionários",
+    icon: PeopleAltIcon,
+    href: "/dashboard/employees",
+    description: "Gerenciar equipe",
+  },
+  {
+    text: "Relatórios",
+    icon: AnalyticsIcon,
+    href: "/dashboard/reports",
+    description: "Análises",
+  },
+  {
+    text: "Configurações",
+    icon: SettingsIcon,
+    href: "/dashboard/settings",
+    description: "Preferências",
+  },
+] as menuItemProps[];
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -24,37 +51,146 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
+
   const drawer = (
-    <Box>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: "linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%)",
+      }}
+    >
       <Toolbar />
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "center",
-                gap: 1,
-                borderRadius: 2,
-              }}
-              component={Link}
+      {/* Menu Items */}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: 1.5,
+          px: 1.5,
+          py: 3,
+        }}
+      >
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.href);
+
+          return (
+            <Link
+              key={item.text}
               href={item.href}
+              style={{ textDecoration: "none" }}
             >
-              <ListItemIcon sx={{ minWidth: "auto" }}>{item.icon}</ListItemIcon>
-              <ListItemText
-                primary={item.text}
-                sx={{ Width: 100 }}
-                slotProps={{
-                  primary: {
-                    variant: "subtitle1",
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  background: active
+                    ? "linear-gradient(135deg, #303633 0%, #465b52 100%)"
+                    : "transparent",
+                  color: active ? "#fff" : "#303633",
+                  position: "relative",
+                  overflow: "hidden",
+
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    height: "100%",
+                    width: "4px",
+                    background: active ? "#8be8cb" : "transparent",
+                    borderRadius: "0 4px 4px 0",
+                  },
+
+                  "&:hover": {
+                    background: active
+                      ? "linear-gradient(135deg, #303633 0%, #465b52 100%)"
+                      : "rgba(48, 54, 51, 0.08)",
+                    transform: "translateX(4px)",
+                    boxShadow: active
+                      ? "0 8px 20px rgba(48, 54, 51, 0.15)"
+                      : "0 4px 12px rgba(48, 54, 51, 0.08)",
                   },
                 }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+              >
+                <Icon
+                  sx={{
+                    fontSize: 22,
+                    transition: "all 0.3s ease",
+                  }}
+                />
+
+                <Box sx={{ flex: 1 }}>
+                  <Box
+                    sx={{
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {item.text}
+                  </Box>
+                  <Box
+                    sx={{
+                      fontSize: "11px",
+                      opacity: active ? 0.85 : 0.6,
+                      transition: "opacity 0.3s ease",
+                      marginTop: "2px",
+                    }}
+                  >
+                    {item.description}
+                  </Box>
+                </Box>
+
+                {active && (
+                  <Box
+                    sx={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: "#8be8cb",
+                      animation:
+                        "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                      "@keyframes pulse": {
+                        "0%, 100%": { opacity: 1 },
+                        "50%": { opacity: 0.5 },
+                      },
+                    }}
+                  />
+                )}
+              </Box>
+            </Link>
+          );
+        })}
+      </Box>
+
+      {/* Footer Section */}
+      <Box
+        sx={{
+          px: 2,
+          py: 2,
+          borderTop: "1px solid #e0e0e0",
+          textAlign: "center",
+          fontSize: "12px",
+          color: "#999",
+          background: "#fff",
+        }}
+      >
+        <span>© Chronos 2025</span>
+      </Box>
     </Box>
   );
 

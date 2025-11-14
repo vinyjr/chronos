@@ -29,7 +29,7 @@ export default function AdminLayout({
           width: { sm: `calc(100% - 240px)` },
         }}
       >
-        <Toolbar /> {/* This adds space below the fixed header */}
+        <Toolbar />
         {children}
       </Box>
     </Box>
