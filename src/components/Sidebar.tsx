@@ -65,7 +65,36 @@ export const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
         background: "linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%)",
       }}
     >
-      <Toolbar />
+      {/* Logo Section */}
+      <Box
+        sx={{
+          px: 2,
+          py: 3,
+          textAlign: "center",
+          borderBottom: "1px solid #e0e0e0",
+        }}
+      >
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            margin: "0 auto",
+            background: "linear-gradient(135deg, #303633 0%, #8be8cb 100%)",
+            borderRadius: "12px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "24px",
+            fontWeight: 700,
+            color: "white",
+            boxShadow: "0 4px 12px rgba(48, 54, 51, 0.2)",
+            fontFamily: "serif",
+          }}
+        >
+          C
+        </Box>
+      </Box>
+
       {/* Menu Items */}
       <Box
         sx={{
@@ -81,11 +110,18 @@ export const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
           const Icon = item.icon;
           const active = isActive(item.href);
 
+          const handleItemClick = () => {
+            if (mobileOpen) {
+              onClose();
+            }
+          };
+
           return (
             <Link
               key={item.text}
               href={item.href}
               style={{ textDecoration: "none" }}
+              onClick={handleItemClick}
             >
               <Box
                 sx={{
@@ -210,6 +246,13 @@ export const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
             width: DRAWER_WIDTH,
+            background: "linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%)",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+          },
+          "& .MuiBackdrop-root": {
+            backdropFilter: "blur(4px)",
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
           },
         }}
       >
@@ -224,6 +267,8 @@ export const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
             width: DRAWER_WIDTH,
+            background: "linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%)",
+            borderRight: "1px solid #e0e0e0",
           },
         }}
         open
