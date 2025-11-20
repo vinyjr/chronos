@@ -1,49 +1,9 @@
 import Link from "next/link";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import Drawer from "@mui/material/Drawer";
-import { DRAWER_WIDTH } from "../contants";
+import { DRAWER_WIDTH } from "../constants/drawer";
 import { usePathname } from "next/navigation";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import SettingsIcon from "@mui/icons-material/Settings";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
-import { ReactElement } from "react";
-
-interface menuItemProps {
-  text: string;
-  icon: (props: any) => ReactElement;
-  href: string;
-  description: string;
-}
-[];
-
-const menuItems = [
-  {
-    text: "Dashboard",
-    icon: DashboardIcon,
-    href: "/dashboard",
-    description: "Visão geral",
-  },
-  {
-    text: "Funcionários",
-    icon: PeopleAltIcon,
-    href: "/dashboard/employees",
-    description: "Gerenciar equipe",
-  },
-  {
-    text: "Relatórios",
-    icon: AnalyticsIcon,
-    href: "/dashboard/reports",
-    description: "Análises",
-  },
-  {
-    text: "Configurações",
-    icon: SettingsIcon,
-    href: "/dashboard/settings",
-    description: "Preferências",
-  },
-] as menuItemProps[];
+import { menuItems } from "@/constants/menuItems";
 
 interface SidebarProps {
   mobileOpen: boolean;

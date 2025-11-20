@@ -1,0 +1,40 @@
+import { ReactElement } from "react";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+
+interface menuItemsProps {
+  text: string;
+  icon: (props: any) => ReactElement;
+  href: string;
+  description: string;
+}
+[];
+
+export const menuItems = [
+  {
+    text: "Dashboard",
+    icon: DashboardIcon,
+    href: "/dashboard",
+    description: "Visão geral",
+  },
+  {
+    text: "Funcionários",
+    icon: PeopleAltIcon,
+    href: "/employees",
+    description: "Gerenciar equipe",
+  },
+  {
+    text: "Relatórios",
+    icon: AnalyticsIcon,
+    href: "/dashboard/reports",
+    description: "Análises",
+  },
+  {
+    text: "Configurações",
+    icon: SettingsIcon,
+    href: "/dashboard/settings",
+    description: "Preferências",
+  },
+] as menuItemsProps[];
