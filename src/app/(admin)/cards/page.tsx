@@ -50,7 +50,9 @@ export default function CardsPage() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState(false);
   const [openActivateDialog, setOpenActivateDialog] = useState(false);
-  const [selectedCardToActivate, setSelectedCardToActivate] = useState<number | null>(null);
+  const [selectedCardToActivate, setSelectedCardToActivate] = useState<
+    number | null
+  >(null);
   const [isActivating, setIsActivating] = useState(false);
   const [activateError, setActivateError] = useState<string | null>(null);
 
@@ -371,10 +373,7 @@ export default function CardsPage() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleCloseActivateDialog}
-            disabled={isActivating}
-          >
+          <Button onClick={handleCloseActivateDialog} disabled={isActivating}>
             Cancelar
           </Button>
           <Button
