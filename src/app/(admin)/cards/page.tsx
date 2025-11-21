@@ -29,6 +29,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import { useCard } from "@/hooks/useCard";
 import { useEmployee } from "@/hooks/useEmployee";
 import { Employee } from "@/types/employee";
@@ -48,6 +49,10 @@ export default function CardsPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState(false);
+  const [openActivateDialog, setOpenActivateDialog] = useState(false);
+  const [selectedCardToActivate, setSelectedCardToActivate] = useState<number | null>(null);
+  const [isActivating, setIsActivating] = useState(false);
+  const [activateError, setActivateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (employees && employees.length > 0) {
@@ -114,6 +119,54 @@ export default function CardsPage() {
       );
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleOpenActivateDialog = (employeeId: number) => {
+    setSelectedCardToActivate(employeeId);
+    setOpenActivateDialog(true);
+    setActivateError(null);
+  };
+
+  const handleCloseActivateDialog = () => {
+    setOpenActivateDialog(false);
+    setSelectedCardToActivate(null);
+    setActivateError(null);
+  };
+
+  const handleConfirmActivate = async () => {
+    if (!selectedCardToActivate) {
+      setActivateError("ID do cartão não encontrado");
+      return;
+    }
+
+    try {
+      setIsActivating(true);
+      setActivateError(null);
+
+      const response = await fetch(
+        `/api/cards/activate/employee/${selectedCardToActivate}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Erro ao ativar cartão");
+      }
+
+      await fetchCards();
+      handleCloseActivateDialog();
+    } catch (err) {
+      setActivateError(
+        err instanceof Error ? err.message : "Erro ao ativar cartão"
+      );
+    } finally {
+      setIsActivating(false);
     }
   };
 
@@ -215,14 +268,20 @@ export default function CardsPage() {
                       />
                     )}
                   </TableCell>
-                  {/* <TableCell align="center">
-                    <IconButton size="small" color="primary" title="Editar">
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton size="small" color="error" title="Deletar">
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell> */}
+                  <TableCell align="center">
+                    {!card.active && (
+                      <IconButton
+                        size="small"
+                        color="success"
+                        title="Ativar"
+                        onClick={() =>
+                          handleOpenActivateDialog(card.employeeId)
+                        }
+                      >
+                        <PowerSettingsNewIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -289,6 +348,42 @@ export default function CardsPage() {
             disabled={isCreating || !selectedEmployeeId || createSuccess}
           >
             {isCreating ? "Criando..." : "Criar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openActivateDialog}
+        onClose={handleCloseActivateDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Ativar Cartão de Ponto</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {activateError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {activateError}
+            </Alert>
+          )}
+          <Typography>
+            Tem certeza que deseja ativar o cartão para o funcionário{" "}
+            <strong>{getEmployeeName(selectedCardToActivate || 0)}</strong>?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseActivateDialog}
+            disabled={isActivating}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmActivate}
+            variant="contained"
+            color="success"
+            disabled={isActivating}
+          >
+            {isActivating ? "Ativando..." : "Ativar"}
           </Button>
         </DialogActions>
       </Dialog>
