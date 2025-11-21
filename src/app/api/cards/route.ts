@@ -1,13 +1,15 @@
+import { NextRequest } from "next/server";
+
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-//GET all employees 
+//GET all Cards 
 export async function GET() {
   try {
     if (!baseUrl) {
       return Response.json({ error: 'Base URL not configured' }, { status: 500 });
     }
 
-    const response = await fetch(`${baseUrl}/v1/employee?limit=10&skip=0`, {
+    const response = await fetch(`${baseUrl}/v1/card?limit=10&skip=0`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
@@ -19,15 +21,13 @@ export async function GET() {
     }
 
     const data = await response.json();
-
     return Response.json(data);
   } catch (err) {
     return Response.json({ error: 'Server error' }, { status: 500 });
   }
 }
 
-//POST new employee
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     if (!baseUrl) {
       return Response.json({ 

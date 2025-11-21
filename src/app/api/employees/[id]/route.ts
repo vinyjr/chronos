@@ -130,7 +130,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    console.log(`${baseUrl}/v1/employee/${id}`)
+
     if (!id || isNaN(Number(id))) {
       return NextResponse.json(
         {

@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SettingsIcon from "@mui/icons-material/Settings";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
+import AddCardIcon from '@mui/icons-material/AddCard';
 
 interface menuItemsProps {
   text: string;
@@ -26,10 +26,10 @@ export const menuItems = [
     description: "Gerenciar equipe",
   },
   {
-    text: "Relatórios",
-    icon: AnalyticsIcon,
-    href: "/dashboard/reports",
-    description: "Análises",
+    text: "Cartões de ponto",
+    icon: AddCardIcon,
+    href: "/cards",
+    description: "Gerenciar cartões",
   },
   {
     text: "Configurações",
