@@ -17,37 +17,66 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Alert from "@mui/material/Alert";
 import { useEmployee } from "@/hooks/useEmployee";
 import EmployeeForm from "@/components/EmployeeForm";
+import { Employee } from "@/types/employee";
 
 const ITEMS_PER_PAGE = 10;
 const ROW_HEIGHT = 53;
 const FIXED_TABLE_HEIGHT = ROW_HEIGHT * ITEMS_PER_PAGE;
 
 export default function EmployeesPage() {
-  const { employees, setEmployees, loading, error } = useEmployee();
+  const { employees, deleteEmployee } = useEmployee();
   const [page, setPage] = useState(0);
   const [openForm, setOpenForm] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null
+  );
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleAddEmployee = () => {
+    setSelectedEmployee(null);
     setOpenForm(true);
   };
 
   const handleCloseForm = () => {
     setOpenForm(false);
+    setSelectedEmployee(null);
   };
 
-  const handleEmployeeAdded = () => {
-    // Refresh da lista acontece automaticamente via hook
+  const handleEditEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setOpenForm(true);
   };
 
-  const handleEditEmployee = (id: number) => {
-    console.log("Editar colaborador:", id);
+  const handleDeleteEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setDeleteError(null);
+    setOpenDeleteDialog(true);
   };
 
-  const handleDeleteEmployee = (id: number) => {
-    setEmployees(employees.filter((emp) => emp.id !== id));
-    console.log("Deletar colaborador:", id);
+  const handleConfirmDelete = async () => {
+    if (selectedEmployee) {
+      const result = await deleteEmployee(selectedEmployee.id);
+      if (!result.success) {
+        setDeleteError(result.error || "Erro ao excluir colaborador");
+      } else {
+        setOpenDeleteDialog(false);
+        setSelectedEmployee(null);
+      }
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setOpenDeleteDialog(false);
+    setSelectedEmployee(null);
+    setDeleteError(null);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -80,8 +109,39 @@ export default function EmployeesPage() {
       <EmployeeForm
         open={openForm}
         onClose={handleCloseForm}
-        onEmployeeAdded={handleEmployeeAdded}
+        selectedEmployee={selectedEmployee}
       />
+
+      {/* Diálogo de confirmação de exclusão */}
+      <Dialog open={openDeleteDialog} onClose={handleCancelDelete}>
+        <DialogTitle>Confirmar exclusão</DialogTitle>
+        <DialogContent>
+          {deleteError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {deleteError}
+            </Alert>
+          )}
+          <Typography>
+            Tem certeza que deseja excluir o colaborador{" "}
+            <strong>{selectedEmployee?.name}</strong>?
+          </Typography>
+          <Typography sx={{ mt: 2, color: "warning.main" }}>
+            Esta ação não pode ser desfeita.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} variant="outlined">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+          >
+            Sim, deletar
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <TableContainer
         component={Paper}
@@ -117,7 +177,7 @@ export default function EmployeesPage() {
                     <IconButton
                       size="small"
                       color="primary"
-                      onClick={() => handleEditEmployee(employee.id)}
+                      onClick={() => handleEditEmployee(employee)}
                       title="Editar"
                     >
                       <EditIcon fontSize="small" />
@@ -125,7 +185,7 @@ export default function EmployeesPage() {
                     <IconButton
                       size="small"
                       color="error"
-                      onClick={() => handleDeleteEmployee(employee.id)}
+                      onClick={() => handleDeleteEmployee(employee)}
                       title="Deletar"
                     >
                       <DeleteIcon fontSize="small" />

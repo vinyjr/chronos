@@ -19,6 +19,7 @@ export async function GET() {
     }
 
     const data = await response.json();
+    console.log(data.data)
     return Response.json(data);
   } catch (err) {
     return Response.json({ error: 'Server error' }, { status: 500 });

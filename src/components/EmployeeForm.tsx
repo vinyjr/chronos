@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -13,21 +13,23 @@ import {
   Grid,
 } from "@mui/material";
 
-import { newEmployee } from "@/types/employee";
+import { newEmployee, Employee } from "@/types/employee";
 import { useEmployee } from "@/hooks/useEmployee";
 
 interface EmployeeFormProps {
   open: boolean;
   onClose: () => void;
   onEmployeeAdded?: () => void;
+  selectedEmployee?: Employee | null;
 }
 
 export default function EmployeeForm({
   open,
   onClose,
   onEmployeeAdded,
+  selectedEmployee,
 }: EmployeeFormProps) {
-  const { createEmployee, validateFormData } = useEmployee();
+  const { createEmployee, updateEmployee, validateFormData } = useEmployee();
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -39,6 +41,27 @@ export default function EmployeeForm({
     arrivalTime: "",
     exitTime: "",
   });
+
+  useEffect(() => {
+    if (selectedEmployee) {
+      setFormData({
+        name: selectedEmployee.name,
+        cpf: selectedEmployee.cpf,
+        arrivalTime: selectedEmployee.arrivalTime,
+        exitTime: selectedEmployee.exitTime,
+      });
+    } else {
+      setFormData({
+        name: "",
+        cpf: "",
+        arrivalTime: "",
+        exitTime: "",
+      });
+    }
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setFieldErrors({});
+  }, [selectedEmployee, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -89,7 +112,7 @@ export default function EmployeeForm({
       }));
     }
   };
-  console.log(formData);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -109,10 +132,22 @@ export default function EmployeeForm({
       cpf: cleanCPF,
     };
 
-    const result = await createEmployee(dataToSend);
+    let result;
+    if (selectedEmployee) {
+      // Edição
+      result = await updateEmployee(selectedEmployee.id, dataToSend);
+      if (result.success) {
+        setSuccessMessage("Colaborador atualizado com sucesso!");
+      }
+    } else {
+      // Criação
+      result = await createEmployee(dataToSend);
+      if (result.success) {
+        setSuccessMessage("Colaborador adicionado com sucesso!");
+      }
+    }
 
     if (result.success) {
-      setSuccessMessage("Colaborador adicionado com sucesso!");
       setFormData({
         name: "",
         cpf: "",
@@ -127,7 +162,7 @@ export default function EmployeeForm({
         onEmployeeAdded?.();
       }, 1500);
     } else {
-      setErrorMessage(result.error || "Erro ao adicionar colaborador");
+      setErrorMessage(result.error || "Erro ao processar colaborador");
     }
 
     setLoading(false);
@@ -147,10 +182,12 @@ export default function EmployeeForm({
       onClose();
     }
   };
-  console.log(fieldErrors.name);
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ mt: 1 }}>Novo Colaborador</DialogTitle>
+      <DialogTitle sx={{ mt: 1 }}>
+        {selectedEmployee ? "Editar Colaborador" : "Novo Colaborador"}
+      </DialogTitle>
       <DialogContent sx={{ margin: 1 }}>
         <Grid
           container
@@ -223,7 +260,12 @@ export default function EmployeeForm({
               fullWidth
               error={!!fieldErrors.exitTime}
               helperText={fieldErrors.exitTime || "Formato: HH:MM"}
-              inputProps={{ maxLength: 5, inputMode: "numeric" }}
+              slotProps={{
+                htmlInput: {
+                  maxLength: 5,
+                  inputMode: "numeric",
+                },
+              }}
               sx={{ borderRadius: 3, maxWidth: 250 }}
             />
           </Grid>
@@ -244,7 +286,13 @@ export default function EmployeeForm({
           disabled={loading}
           sx={{ position: "relative", borderRadius: 3 }}
         >
-          {loading ? <CircularProgress size={24} /> : "Adicionar"}
+          {loading ? (
+            <CircularProgress size={24} />
+          ) : selectedEmployee ? (
+            "Atualizar"
+          ) : (
+            "Adicionar"
+          )}
         </Button>
       </DialogActions>
     </Dialog>

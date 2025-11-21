@@ -68,7 +68,6 @@ export function useEmployee() {
     return errors;
   };
 
-  // Criar novo funcionário
   const createEmployee = async (
     formData: newEmployee
   ): Promise<{ success: boolean; error?: string }> => {
@@ -107,12 +106,93 @@ export function useEmployee() {
     }
   };
 
+  const updateEmployee = async (
+    id: number,
+    formData: Partial<newEmployee>
+  ): Promise<{ success: boolean; error?: string }> => {
+    const validationErrors = validateFormData(formData as newEmployee);
+
+    const filteredErrors = Object.keys(validationErrors).reduce(
+      (acc, key) => {
+        if (formData[key as keyof newEmployee]) {
+          acc[key] = validationErrors[key];
+        }
+        return acc;
+      },
+      {} as ValidationError
+    );
+
+    if (Object.keys(filteredErrors).length > 0) {
+      return {
+        success: false,
+        error: Object.values(filteredErrors).join(", "),
+      };
+    }
+
+    try {
+      const response = await fetch(`/api/employees/${id}`, {
+        method: "PATCH",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Falha ao atualizar colaborador");
+      }
+
+      const updatedEmployeeData = await response.json();
+      setEmployees(
+        employees.map((emp) =>
+          emp.id === id ? updatedEmployeeData.data : emp
+        )
+      );
+
+      return { success: true };
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Erro ao atualizar colaborador";
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const deleteEmployee = async (
+    id: number
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/employees/${id}`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Falha ao excluir colaborador");
+      }
+
+      setEmployees(employees.filter((emp) => emp.id !== id));
+
+      return { success: true };
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Erro ao excluir colaborador";
+      return { success: false, error: errorMessage };
+    }
+  };
+
   return {
     employees,
     setEmployees,
     loading,
     error,
     createEmployee,
+    updateEmployee,
+    deleteEmployee,
     validateFormData,
   };
 }
