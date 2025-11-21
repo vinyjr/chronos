@@ -1,23 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { card } from "@/types/card";
+import { timeRecord } from "@/types/time-records";
 
-export function useCard() {
-  const [cards, setCards] = useState<card[]>([]);
+export function useTimeRecords() {
+  const [timeRecords, setCards] = useState<timeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchCards() {
+  async function fetchTimeRecords() {
     try {
       setLoading(true);
-      const response = await fetch("/api/cards", {
+      const response = await fetch("/api/time-records", {
         method: "GET",
         cache: "no-store",
       });
 
       if (!response.ok) {
-        throw new Error("Falha ao buscar cartões");
+        throw new Error("Falha ao buscar registros de tempo");
       }
 
       const data = await response.json();
@@ -32,13 +32,13 @@ export function useCard() {
   }
 
   useEffect(() => {
-    fetchCards();
+    fetchTimeRecords();
   }, []);
 
   return {
-    cards,
+    timeRecords,
     loading,
     error,
-    fetchCards,
+    fetchTimeRecords,
   };
 }

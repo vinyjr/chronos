@@ -17,7 +17,7 @@ export const menuItems = [
     text: "Dashboard",
     icon: DashboardIcon,
     href: "/dashboard",
-    description: "Visão geral",
+    description: "Registros de entradas/saídas",
   },
   {
     text: "Funcionários",
@@ -30,11 +30,5 @@ export const menuItems = [
     icon: AddCardIcon,
     href: "/cards",
     description: "Gerenciar cartões",
-  },
-  {
-    text: "Configurações",
-    icon: SettingsIcon,
-    href: "/dashboard/settings",
-    description: "Preferências",
-  },
+  }
 ] as menuItemsProps[];
