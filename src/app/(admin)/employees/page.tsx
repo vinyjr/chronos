@@ -18,6 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { useEmployee } from "@/hooks/useEmployee";
+import EmployeeForm from "@/components/EmployeeForm";
 
 const ITEMS_PER_PAGE = 10;
 const ROW_HEIGHT = 53;
@@ -26,9 +27,18 @@ const FIXED_TABLE_HEIGHT = ROW_HEIGHT * ITEMS_PER_PAGE;
 export default function EmployeesPage() {
   const { employees, setEmployees, loading, error } = useEmployee();
   const [page, setPage] = useState(0);
+  const [openForm, setOpenForm] = useState(false);
 
   const handleAddEmployee = () => {
-    console.log("Adicionar novo colaborador");
+    setOpenForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setOpenForm(false);
+  };
+
+  const handleEmployeeAdded = () => {
+    // Refresh da lista acontece automaticamente via hook
   };
 
   const handleEditEmployee = (id: number) => {
@@ -66,6 +76,12 @@ export default function EmployeesPage() {
           Novo Colaborador
         </Button>
       </Box>
+
+      <EmployeeForm
+        open={openForm}
+        onClose={handleCloseForm}
+        onEmployeeAdded={handleEmployeeAdded}
+      />
 
       <TableContainer
         component={Paper}
