@@ -21,6 +21,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import { useCard } from "@/hooks/useCard";
 import { useEmployee } from "@/hooks/useEmployee";
 import { Employee } from "@/types/employee";
@@ -35,6 +43,11 @@ export default function CardsPage() {
   const [employeeMap, setEmployeeMap] = useState<Map<number, Employee>>(
     new Map()
   );
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | "">("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createSuccess, setCreateSuccess] = useState(false);
 
   useEffect(() => {
     if (employees && employees.length > 0) {
@@ -49,6 +62,59 @@ export default function CardsPage() {
   const getEmployeeName = (employeeId: number): string => {
     const employee = employeeMap.get(employeeId);
     return employee ? employee.name : "Funcionário não encontrado";
+  };
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+    setSelectedEmployeeId("");
+    setCreateError(null);
+    setCreateSuccess(false);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedEmployeeId("");
+    setCreateError(null);
+    setCreateSuccess(false);
+  };
+
+  const handleCreateCard = async () => {
+    if (!selectedEmployeeId) {
+      setCreateError("Selecione um funcionário");
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      setCreateError(null);
+
+      const response = await fetch(
+        `/api/cards/employee/${selectedEmployeeId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Erro ao criar cartão");
+      }
+
+      setCreateSuccess(true);
+      await fetchCards();
+      setTimeout(() => {
+        handleCloseDialog();
+      }, 1000);
+    } catch (err) {
+      setCreateError(
+        err instanceof Error ? err.message : "Erro ao criar cartão"
+      );
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   if (loading) {
@@ -88,6 +154,7 @@ export default function CardsPage() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
+          onClick={handleOpenDialog}
           sx={{ textTransform: "none", fontSize: "1rem", borderRadius: 1 }}
         >
           Novo Cartão
@@ -174,6 +241,57 @@ export default function CardsPage() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Criar Novo Cartão de Ponto</DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          {createError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {createError}
+            </Alert>
+          )}
+          {createSuccess && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Cartão criado com sucesso!
+            </Alert>
+          )}
+          <FormControl fullWidth disabled={isCreating || createSuccess}>
+            <InputLabel>Funcionário</InputLabel>
+            <Select
+              value={selectedEmployeeId}
+              label="Funcionário"
+              onChange={(e) => setSelectedEmployeeId(e.target.value as number)}
+            >
+              {employees && employees.length > 0 ? (
+                employees.map((emp: Employee) => (
+                  <MenuItem key={emp.id} value={emp.id}>
+                    {emp.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>Nenhum funcionário disponível</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} disabled={isCreating}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleCreateCard}
+            variant="contained"
+            disabled={isCreating || !selectedEmployeeId || createSuccess}
+          >
+            {isCreating ? "Criando..." : "Criar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
