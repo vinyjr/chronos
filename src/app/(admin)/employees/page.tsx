@@ -17,94 +17,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import { Employee } from "@/types/employee";
-
-const initialEmployees: Employee[] = [
-  {
-    id: 1,
-    name: "João Silva",
-    cpf: "123.456.789-00",
-    arrivalTime: "08:00",
-    exitTime: "17:00",
-  },
-  {
-    id: 2,
-    name: "Maria Santos",
-    cpf: "987.654.321-11",
-    arrivalTime: "09:00",
-    exitTime: "18:00",
-  },
-  {
-    id: 3,
-    name: "Pedro Costa",
-    cpf: "456.789.123-22",
-    arrivalTime: "08:30",
-    exitTime: "17:30",
-  },
-  {
-    id: 4,
-    name: "Ana Oliveira",
-    cpf: "111.222.333-44",
-    arrivalTime: "07:30",
-    exitTime: "16:30",
-  },
-  {
-    id: 5,
-    name: "Carlos Souza",
-    cpf: "555.666.777-88",
-    arrivalTime: "08:15",
-    exitTime: "17:15",
-  },
-  {
-    id: 6,
-    name: "Fernanda Lima",
-    cpf: "999.000.111-22",
-    arrivalTime: "09:30",
-    exitTime: "18:30",
-  },
-  {
-    id: 7,
-    name: "Roberto Dias",
-    cpf: "333.444.555-66",
-    arrivalTime: "08:00",
-    exitTime: "17:00",
-  },
-  {
-    id: 8,
-    name: "Juliana Pereira",
-    cpf: "777.888.999-00",
-    arrivalTime: "08:45",
-    exitTime: "17:45",
-  },
-  {
-    id: 9,
-    name: "Lucas Santos",
-    cpf: "222.333.444-55",
-    arrivalTime: "07:00",
-    exitTime: "16:00",
-  },
-  {
-    id: 10,
-    name: "Beatriz Costa",
-    cpf: "666.777.888-99",
-    arrivalTime: "09:00",
-    exitTime: "18:00",
-  },
-  {
-    id: 11,
-    name: "Marcelo Silva",
-    cpf: "444.555.666-77",
-    arrivalTime: "08:30",
-    exitTime: "17:30",
-  },
-];
+import { useEmployee } from "@/hooks/useEmployee";
 
 const ITEMS_PER_PAGE = 10;
 const ROW_HEIGHT = 53;
 const FIXED_TABLE_HEIGHT = ROW_HEIGHT * ITEMS_PER_PAGE;
 
 export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const { employees, setEmployees, loading, error } = useEmployee();
   const [page, setPage] = useState(0);
 
   const handleAddEmployee = () => {
@@ -123,11 +43,6 @@ export default function EmployeesPage() {
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
-
-  const paginatedEmployees = employees.slice(
-    page * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE + ITEMS_PER_PAGE
-  );
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -168,8 +83,8 @@ export default function EmployeesPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedEmployees.length > 0 ? (
-              paginatedEmployees.map((employee) => (
+            {employees.length > 0 ? (
+              employees.map((employee) => (
                 <TableRow
                   key={employee.id}
                   sx={{
