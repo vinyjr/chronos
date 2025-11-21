@@ -42,11 +42,46 @@ export default function EmployeeForm({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    let formattedValue = value;
+
+    if (name === "name") {
+      formattedValue = value.slice(0, 100);
+    } else if (name === "cpf") {
+      const numericValue = value.replace(/\D/g, "").slice(0, 11);
+      if (numericValue.length <= 3) {
+        formattedValue = numericValue;
+      } else if (numericValue.length <= 6) {
+        formattedValue = numericValue.slice(0, 3) + "." + numericValue.slice(3);
+      } else if (numericValue.length <= 9) {
+        formattedValue =
+          numericValue.slice(0, 3) +
+          "." +
+          numericValue.slice(3, 6) +
+          "." +
+          numericValue.slice(6);
+      } else {
+        formattedValue =
+          numericValue.slice(0, 3) +
+          "." +
+          numericValue.slice(3, 6) +
+          "." +
+          numericValue.slice(6, 9) +
+          "-" +
+          numericValue.slice(9);
+      }
+    } else if (name === "arrivalTime" || name === "exitTime") {
+      const numericValue = value.replace(/\D/g, "").slice(0, 4);
+      if (numericValue.length <= 2) {
+        formattedValue = numericValue;
+      } else {
+        formattedValue = numericValue.slice(0, 2) + ":" + numericValue.slice(2);
+      }
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: formattedValue,
     }));
-    // Limpar erro do campo ao editar
     if (fieldErrors[name]) {
       setFieldErrors((prev) => ({
         ...prev,
@@ -54,14 +89,13 @@ export default function EmployeeForm({
       }));
     }
   };
-
+  console.log(formData);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    // Validar formulário
     const errors = validateFormData(formData);
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -69,7 +103,13 @@ export default function EmployeeForm({
       return;
     }
 
-    const result = await createEmployee(formData);
+    const cleanCPF = formData.cpf.replace(/\D/g, "");
+    const dataToSend = {
+      ...formData,
+      cpf: cleanCPF,
+    };
+
+    const result = await createEmployee(dataToSend);
 
     if (result.success) {
       setSuccessMessage("Colaborador adicionado com sucesso!");
@@ -130,7 +170,12 @@ export default function EmployeeForm({
             fullWidth
             disabled={loading}
             error={!!fieldErrors.name}
-            helperText={fieldErrors.name}
+            helperText={fieldErrors.name || `${formData.name.length}/100`}
+            slotProps={{
+              htmlInput: {
+                maxLength: 100,
+              },
+            }}
           />
 
           <TextField
@@ -142,7 +187,13 @@ export default function EmployeeForm({
             disabled={loading}
             placeholder="000.000.000-00"
             error={!!fieldErrors.cpf}
-            helperText={fieldErrors.cpf || "Mínimo 11 caracteres"}
+            helperText={fieldErrors.cpf || "11 dígitos"}
+            slotProps={{
+              htmlInput: {
+                maxLength: 14,
+                inputMode: "numeric",
+              },
+            }}
             sx={{ borderRadius: 3 }}
           />
           <Grid
@@ -158,6 +209,7 @@ export default function EmployeeForm({
               fullWidth
               error={!!fieldErrors.arrivalTime}
               helperText={fieldErrors.arrivalTime || "Formato: HH:MM"}
+              inputProps={{ maxLength: 5, inputMode: "numeric" }}
               sx={{ borderRadius: 3, maxWidth: 250 }}
             />
 
@@ -171,6 +223,7 @@ export default function EmployeeForm({
               fullWidth
               error={!!fieldErrors.exitTime}
               helperText={fieldErrors.exitTime || "Formato: HH:MM"}
+              inputProps={{ maxLength: 5, inputMode: "numeric" }}
               sx={{ borderRadius: 3, maxWidth: 250 }}
             />
           </Grid>

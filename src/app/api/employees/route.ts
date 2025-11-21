@@ -37,7 +37,6 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    // Validar campos obrigatórios
     if (!body.name || body.name.trim() === '') {
       return Response.json({ 
         statusCode: 400,
@@ -45,7 +44,6 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Validar CPF (deve ter no mínimo 11 caracteres)
     const cleanCPF = body.cpf?.replace(/\D/g, '') || '';
     if (cleanCPF.length < 11) {
       return Response.json({ 
@@ -54,7 +52,6 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Validar formato de hora (HH:MM)
     const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
     
     if (!body.arrivalTime || !timeRegex.test(body.arrivalTime)) {
@@ -82,7 +79,6 @@ export async function POST(request: Request) {
 
     const data = await response.json();
 
-    // Tratamento de erro 409 (Conflito - CPF já existe)
     if (response.status === 409) {
       return Response.json({ 
         statusCode: 409,
@@ -90,7 +86,6 @@ export async function POST(request: Request) {
       }, { status: 409 });
     }
 
-    // Tratamento de erro 400 (Validação)
     if (response.status === 400) {
       return Response.json({ 
         statusCode: 400,
@@ -98,7 +93,6 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Tratamento de outros erros
     if (!response.ok) {
       return Response.json({ 
         statusCode: response.status,
@@ -106,7 +100,6 @@ export async function POST(request: Request) {
       }, { status: response.status });
     }
 
-    // Sucesso 201
     return Response.json({ 
       statusCode: 201,
       data: data.data || data 
